@@ -4,6 +4,8 @@
 ## Updates
 https://blog.spin.rip/p/discord-cdn-changes
 
+Version without PostgreSQL: https://github.com/spinfal/cdn-slave/tree/a8da067bacd612ee13dff6cad86bf57e0265b241
+
 # CDN Slave
 A simple website that allows you to upload files to Discord's CDN without having to do it in their app.
 
