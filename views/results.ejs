@@ -95,15 +95,39 @@
                     </div>
                 </div>
                 <footer class="p-4 bg-white rounded shadow-md md:flex md:items-center md:justify-between md:p-6 container w-full max-w-md">
-                    <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400"><%= uploadDate %>
+                    <span
+                        id="upload-date"
+                        class="text-sm text-gray-500 sm:text-center dark:text-gray-400"
+                        data-uploaded-at="<%= uploadedAt %>"
+                    >
+                        <%= uploadDate || "Upload time unavailable" %>
                     </span>
                     <ul class="flex flex-wrap items-center mt-3 sm:mt-0">
                         <li>
-                            <a href="https://mimeapplication.net/<%= fileType.split('/')[1] %>" target="_blank" rel="noreferrer"><p class="text-sm text-gray-500 sm:text-center dark:text-blue-400 hover:underline decoration-dotted"><%= fileType %></p></a>
+                            <% if (fileType && fileTypeSlug) { %>
+                                <a href="https://mimeapplication.net/<%= fileTypeSlug %>" target="_blank" rel="noreferrer"><p class="text-sm text-gray-500 sm:text-center dark:text-blue-400 hover:underline decoration-dotted"><%= fileType %></p></a>
+                            <% } else { %>
+                                <p class="text-sm text-gray-500 sm:text-center dark:text-gray-400">Unknown MIME type</p>
+                            <% } %>
                         </li>
                     </ul>
                 </footer>
             </div>
         </div>
+        <script>
+        const uploadDateEl = document.getElementById("upload-date");
+        if (uploadDateEl) {
+            const timestamp = Number(uploadDateEl.dataset.uploadedAt);
+            if (Number.isFinite(timestamp) && timestamp > 0) {
+                const userZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                const formatter = new Intl.DateTimeFormat(undefined, {
+                    dateStyle: "long",
+                    timeStyle: "short",
+                    timeZone: userZone
+                });
+                uploadDateEl.textContent = `File uploaded on ${formatter.format(new Date(timestamp))} (${userZone})`;
+            }
+        }
+        </script>
     </body>
 </html>

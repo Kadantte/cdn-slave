@@ -4,7 +4,9 @@
   "description": "Upload to Discord's CDN without having to use the Discord app.",
   "main": "app.js",
   "scripts": {
-    "build-css": "npx tailwindcss -i ./development/tailwind.css -o ./public/css/index.css -m",
+    "build-css": "tailwindcss -i ./development/tailwind.css -o ./public/css/index.css -m",
+    "db:init": "node scripts/init-db.js",
+    "setup": "npm i && npx update-browserslist-db@latest && node scripts/setup.js",
     "start": "node app.js",
     "watch-node": "nodemon app.js",
     "dev": "npm run build-css && npm run watch-node"
@@ -20,19 +22,20 @@
   },
   "homepage": "https://github.com/spinfal/cdn-slave#readme",
   "dependencies": {
-    "axios": "^1.6.7",
-    "body-parser": "^1.20.2",
-    "cookie-parser": "^1.4.6",
-    "discord.js": "12.5.3",
-    "ejs": "^3.1.9",
-    "express": "^4.18.1",
-    "express-fileupload": "^1.4.2",
+    "axios": "^1.7.7",
+    "cookie-parser": "^1.4.7",
+    "discord.js": "^14.14.1",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "express-fileupload": "^1.5.0",
     "knex": "^3.1.0",
-    "moment": "^2.29.4",
-    "moment-timezone": "^0.5.43",
-    "pg": "^8.11.3"
+    "mime-types": "^2.1.35",
+    "pino": "^9.3.2",
+    "pino-http": "^9.0.0",
+    "sqlite3": "^5.1.7"
   },
   "devDependencies": {
-    "nodemon": "^2.0.20"
+    "nodemon": "^3.1.0",
+    "tailwindcss": "^3.4.7"
   }
 }

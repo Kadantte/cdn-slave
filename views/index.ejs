@@ -86,7 +86,8 @@
                 const fileInput = document.getElementById("file");
                 const mid = document.getElementById("mid");
                 const file = fileInput?.files[0];
-                if (!file && !mid) {
+                const messageId = mid?.value?.trim();
+                if (!file && !messageId) {
                     return;
                 }
                 if (file && file.size >= <%= byteFileSize %>) {

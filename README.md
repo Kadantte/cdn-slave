@@ -4,8 +4,6 @@
 ## Updates
 https://blog.spin.rip/p/discord-cdn-changes
 
-Version without PostgreSQL: https://github.com/spinfal/cdn-slave/tree/a8da067bacd612ee13dff6cad86bf57e0265b241
-
 # CDN Slave
 A simple website that allows you to upload files to Discord's CDN without having to do it in their app.
 
@@ -31,12 +29,20 @@ cd cdn-slave
 - Make sure this is enabled
 ![Message Content Intent](https://cdn.spin.rip/r/8ee0777a-7e2c-41ab-a64d-b6ba8b9c8df6.png "Message Content Intent")
 - Invite the bot to your server using this link: `https://discord.com/api/oauth2/authorize?client_id=INSERT YOUR APPLICATION ID&permissions=52224&scope=bot`
-- Configure the `Global.js` file 
+- Configure the `Global.js` file (bot, channel, and database settings)
 
 ### Continue with running these commands:
 ```
 npm i
 ```
+```
+npm run setup
+```
+This creates `Global.js` if missing, initializes the SQLite database, and builds CSS.
+```
+npm run db:init
+```
+If you skip `setup`, run `db:init` manually.
 ```
 npm run start
 ```
@@ -49,6 +55,29 @@ npm run dev
 The website will be up @ http://localhost:443 (unless you've changed the config)
 
 Files uploaded on the site will be available in the channel that you set in `Global.js`
+
+If you want custom URLs to point at your domain, set `publicUrl` in `Global.js`.
+
+## Database
+SQLite stores data in a local file at `data/cdn-slave.sqlite` by default.
+To move it elsewhere, update `database.filename` in `Global.js`.
+
+## Upload Controls
+Uploads use the size limit from `maxFileSize` and run through rate limiting, MIME checks, and concurrency caps.
+Adjust these settings in `Global.js`:
+- `upload.rateLimit.windowMs` and `upload.rateLimit.max` (per-IP requests)
+- `upload.maxConcurrent` (simultaneous uploads)
+- `upload.allowedMimeTypes` and `upload.allowedMimePrefixes`
+- `upload.tempDir` (where temporary upload files are stored)
+
+The defaults allow common media formats plus PDF/ZIP. Update the allow lists if you want other file types.
+Set both allow lists to empty arrays if you want to accept any MIME type.
+
+## Health Check
+`GET /health` returns `{"status":"ok"}` when the server and database are reachable.
+
+## Other Settings
+`logLevel` controls server logging verbosity, and `defaultTimezone` is used as the fallback for server-side timestamps before the browser converts them to the viewer's timezone.
 
 ## Usage with ShareX
 CDN Slave can also be used with [ShareX](https://getsharex.com/)! Follow these steps to get it working (don't want to follow steps? [click here to download the config](https://cdn.spin.rip/r/CDN-Slave_(Discord_CDN).sxcu)):
