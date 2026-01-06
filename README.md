@@ -1,5 +1,5 @@
-![CDN Slave status](https://status.spin.rip/api/badge/9/status?style=for-the-badge)
-![CDN Slave uptime](https://status.spin.rip/api/badge/9/uptime/48?labelPrefix=CDN-Slave+&style=for-the-badge)
+![CDN Slave status](https://status.spin.rip/api/badge/6/status?upColor=%237289da&&style=for-the-badge)
+![CDN Slave uptime](https://status.spin.rip/api/badge/6/uptime?color=%237289da&style=for-the-badge)
 
 ## Updates
 https://blog.spin.rip/p/discord-cdn-changes
