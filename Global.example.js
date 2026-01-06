@@ -16,6 +16,11 @@ exports.config = {
       windowMs: 900000,
       max: 30
     },
+    /*
+      if you want to allow all mime types and don't care for this,
+      you can just set these to empty arrays. this will make any mime type
+      able to be uploaded.
+    */
     allowedMimeTypes: [
       'application/pdf',
       'application/zip'
