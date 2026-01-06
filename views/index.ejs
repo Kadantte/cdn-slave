@@ -30,6 +30,19 @@
                 }
             }
         </style>
+        <style>
+            .file-input-hidden {
+                position: absolute;
+                width: 1px;
+                height: 1px;
+                padding: 0;
+                margin: -1px;
+                overflow: hidden;
+                clip: rect(0, 0, 0, 0);
+                white-space: nowrap;
+                border: 0;
+            }
+        </style>
     </head>
     <body class="px-2">
         <div class="container mx-auto">
@@ -41,9 +54,9 @@
                             <p class="text-gray-700 text-sm">Because Discord is our new CDN slave</p>
                             <a href="https://blog.spin.rip/p/discord-cdn-changes" target="_blank" class="mt-2 inline-block text-red-500 hover:text-red-600 px-2 py-1 bg-red-200 hover:bg-red-300 rounded-md cursor-pointer"><strong>CDN-SLAVE UPDATES</strong></a>
                         </div>
-                        <form id="upload-form" enctype="multipart/form-data" class="flex flex-col items-center px-8">
+                        <form id="upload-form" enctype="multipart/form-data" method="post" action="/api/upload" class="flex flex-col items-center px-8">
                             <label for="file" id="fileLabel" class="block shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">Choose a file</label>
-                            <input onchange="window.label.innerText = this.files[0].name" type="file" name="file" id="file" class="hidden">
+                            <input onchange="window.label.innerText = this.files[0]?.name || 'Choose a file'" type="file" name="file" id="file" class="file-input-hidden">
                             <p class="text-gray-700/75 text-sm mt-1 mb-2"><em>Maximum file size: ~<%= humanFileSize %></em></p>
                             <p class="text-gray-400/75">or</p>
                             <input type="number" name="mid" id="mid" placeholder="message id" class="block shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline cursor-pointer">
@@ -81,6 +94,9 @@
             const uploadForm = document.getElementById("upload-form");
             const progressBar = document.getElementById("progress-bar");
             window.label = document.getElementById("fileLabel");
+            const isIOS =
+                /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
             uploadBtn.addEventListener("click", function () {
                 const fileInput = document.getElementById("file");
@@ -100,20 +116,35 @@
                 uploadBtn.innerText = "Please wait...";
                 setInterval(() => uploadBtn.innerText = phrases[Math.floor(Math.random() * phrases.length)], 7000);
 
+                if (isIOS) {
+                    uploadForm.submit();
+                    return;
+                }
+
                 let formData = new FormData(uploadForm);
                 let request = new XMLHttpRequest();
 
                 request.upload.addEventListener('progress', function (e) {
-                    let percent_complete = (e.loaded / e.total)*100;
+                    if (!e.lengthComputable || e.total === 0) {
+                        return;
+                    }
+                    let percent_complete = (e.loaded / e.total) * 100;
                     progressBar.style.width = percent_complete + '%';
                 });
 
                 request.addEventListener('load', function(e) {
-                    if(request.status == 200){
+                    if (request.status >= 200 && request.status < 300) {
                         location.href = '/results';
                     } else {
-                        alert('Upload failed');
+                        const message = request.responseText ? `: ${request.responseText}` : '';
+                        alert(`Upload failed (${request.status})${message}`);
                     }
+                });
+                request.addEventListener('error', function () {
+                    alert('Upload failed (network error)');
+                });
+                request.addEventListener('abort', function () {
+                    alert('Upload failed (request aborted)');
                 });
 
                 request.open('post', '/api/upload');
