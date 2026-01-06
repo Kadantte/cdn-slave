@@ -412,23 +412,45 @@ function formatUploadDate(timestamp) {
   if (!Number.isFinite(timestamp)) {
     return "";
   }
-  const timezone = Global.defaultTimezone || "America/Los_Angeles";
-  let formatter;
-  try {
-    formatter = new Intl.DateTimeFormat(undefined, {
-      dateStyle: "long",
-      timeStyle: "short",
-      timeZone: timezone,
-      timeZoneName: "short",
-    });
-  } catch (error) {
-    formatter = new Intl.DateTimeFormat(undefined, {
-      dateStyle: "long",
-      timeStyle: "short",
-      timeZoneName: "short",
-    });
+  if (typeof Intl === "undefined" || typeof Intl.DateTimeFormat !== "function") {
+    return `File uploaded on ${new Date(timestamp).toISOString()}`;
   }
-  return `File uploaded on ${formatter.format(new Date(timestamp))}`;
+  const timezone = Global.defaultTimezone || "America/Los_Angeles";
+  const timeZoneOption =
+    typeof timezone === "string" && timezone.trim() ? timezone.trim() : "";
+  const baseOptions = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  };
+  const date = new Date(timestamp);
+
+  const tryFormat = (options) =>
+    `File uploaded on ${new Intl.DateTimeFormat(undefined, options).format(date)}`;
+
+  try {
+    const options = { ...baseOptions, timeZoneName: "short" };
+    if (timeZoneOption) {
+      options.timeZone = timeZoneOption;
+    }
+    return tryFormat(options);
+  } catch (error) {
+    try {
+      const options = { ...baseOptions };
+      if (timeZoneOption) {
+        options.timeZone = timeZoneOption;
+      }
+      return tryFormat(options);
+    } catch (fallbackError) {
+      try {
+        return tryFormat(baseOptions);
+      } catch (finalError) {
+        return `File uploaded on ${date.toISOString()}`;
+      }
+    }
+  }
 }
 
 function ensureUploadTempDir(tempDir) {
